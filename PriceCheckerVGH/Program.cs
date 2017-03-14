@@ -12,12 +12,16 @@ namespace PriceCheckerVGH
     {
         static void Main(string[] args)
         {
+            string lastScan=null;
             Console.WriteLine("Enter Y and enter at any time to exit scanner.");
-
+            
+            
             SerialPort scanner = new SerialPort("COM7");
             scanner.DataBits = 8;
             Console.WriteLine("Connecting to COM...");
             scanner.ReadTimeout = 30000;
+
+            Core coreProcess = new Core();
             try
             {
                 scanner.Open();
@@ -42,11 +46,33 @@ namespace PriceCheckerVGH
                 {
                     statusflag = false;
                 }
+                else if(lastScan == input)
+                {
+                    var gameCallStatus = coreProcess.writeGame();
+                    if (gameCallStatus > 0)
+                    {
+                        scanner.WriteLine("Game Added");
+                    }
+                    lastScan = null;
+                }
                 else
                 {
-                    Core coreProcess = new Core();
                     coreProcess.getPrice(input).Wait();
-                    scanner.WriteLine(coreProcess.cost);
+                    var gameCallStatus = coreProcess.flag;
+                    if (gameCallStatus == "OK")
+                    {
+                        if (coreProcess.cost == null)
+                        {
+                            scanner.Write("No price found.");
+                        }
+                        else
+                        {
+                            scanner.WriteLine(coreProcess.cost);
+                            lastScan = input;
+                            Console.WriteLine("Game found in db");
+
+                        }
+                    }
                 }
 
             }

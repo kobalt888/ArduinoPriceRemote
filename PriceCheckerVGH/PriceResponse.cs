@@ -13,5 +13,14 @@ namespace PriceCheckerVGH
     {
         [DataMember(Name = "gamestop-price")]
         public string price { get; set; }
+
+        [DataMember(Name = "console-name")]
+        public string consoleType { get; set; }
+
+        [DataMember(Name = "product-name")]
+        public string gameTitle { get; set; }
+
+        [DataMember(Name = "upc")]
+        public string upc { get; set; }
     }
 }
