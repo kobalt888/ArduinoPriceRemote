@@ -51,7 +51,7 @@ namespace PriceCheckerVGH
                     var gameCallStatus = coreProcess.writeGame();
                     if (gameCallStatus > 0)
                     {
-                        scanner.WriteLine("Game Added");
+                        scanner.WriteLine(coreProcess.gTitle + "-Added to .csv");
                     }
                     lastScan = null;
                 }
@@ -67,10 +67,9 @@ namespace PriceCheckerVGH
                         }
                         else
                         {
-                            scanner.WriteLine(coreProcess.cost);
+                            scanner.WriteLine(coreProcess.gTitle + "-" + coreProcess.cost);
                             lastScan = input;
                             Console.WriteLine("Game found in db");
-
                         }
                     }
                 }

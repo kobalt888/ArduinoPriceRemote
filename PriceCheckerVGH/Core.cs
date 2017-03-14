@@ -26,8 +26,11 @@ namespace PriceCheckerVGH
         static string finalFileName = fileName.Replace("/", "-");
         string filePath = (Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/"+finalFileName+" Used Price Update List.csv");
 
+        //
+        public string gTitle;
 
 
+        //
 
         public async Task<String> getPrice(string upc)
         {
@@ -52,7 +55,7 @@ namespace PriceCheckerVGH
                     DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(PriceResponse));
                     pResponse = (PriceResponse)serializer.ReadObject(ms);
                     ms.Flush();
-
+                    gTitle = pResponse.gameTitle;
                     if (pResponse.price == null)
                     {
                         cost = null;
