@@ -9,16 +9,16 @@ using System.Runtime.Serialization;
 namespace PriceCheckerVGH
 {
     [DataContract]
-    public class PriceResponse
+    public class Game
     {
         [DataMember(Name = "gamestop-price")]
         public string price { get; set; }
 
         [DataMember(Name = "console-name")]
-        public string consoleType { get; set; }
+        public string console { get; set; }
 
         [DataMember(Name = "product-name")]
-        public string gameTitle { get; set; }
+        public string title { get; set; }
 
         [DataMember(Name = "upc")]
         public string upc { get; set; }

@@ -16,23 +16,20 @@ namespace PriceCheckerVGH
 {
     public class Core
     {
-        public string cost { get; set; }
-        PriceResponse pResponse;
-        static DateTime now = DateTime.Now;
-        Boolean status=true;
-        public string flag = null;
 
+        public Game gameData;
+
+        Boolean status=true;
+
+        //Variables to construct the filename for excel spread
+        static DateTime now = DateTime.Now;
         static string fileName = now.ToShortDateString();
         static string finalFileName = fileName.Replace("/", "-");
         string filePath = (Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/"+finalFileName+" Used Price Update List.csv");
-
-        //
-        public string gTitle;
+        //TODO: Clean this up...
 
 
-        //
-
-        public async Task<String> getPrice(string upc)
+        public async Task<Game> getGame(string upc)
         {
 
             HttpClient gamePricer = new HttpClient();
@@ -52,65 +49,59 @@ namespace PriceCheckerVGH
                 {
 
                     MemoryStream ms = new MemoryStream(Encoding.Unicode.GetBytes(jsonString.Result));
-                    DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(PriceResponse));
-                    pResponse = (PriceResponse)serializer.ReadObject(ms);
+                    DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(Game));
+                    gameData = (Game)serializer.ReadObject(ms);
                     ms.Flush();
-                    gTitle = pResponse.gameTitle;
-                    if (pResponse.price == null)
+
+                    if (gameData.price == null)
                     {
-                        cost = null;
-                        flag = "OK";
-                        Console.WriteLine(pResponse.gameTitle + " for console " + pResponse.consoleType + " found, but no price.");
-                        return "OK";
+                        Console.WriteLine(gameData.title + " for console " + gameData.console + " found, but no price.");
+                        return gameData;
                     }
 
-                    if (pResponse.price.Length == 5)
+                    if (gameData.price.Length == 5)
                     {
-                        var finalCostFormat = pResponse.price.Insert(3, ".");
+                        var finalCostFormat = gameData.price.Insert(3, ".");
                         char[] array = finalCostFormat.ToCharArray();
                         array[4] = '9';
-                        cost = "$" + new string(array);
+                        gameData.price = "$" + new string(array);
                     }
 
-                    else if (pResponse.price.Length == 4)
+                    else if (gameData.price.Length == 4)
                     {
-                        var finalCostFormat= pResponse.price.Insert(2, ".");
+                        var finalCostFormat = gameData.price.Insert(2, ".");
                         char[] array = finalCostFormat.ToCharArray();
                         array[3] = '9';
-                        cost = "$" + new string(array);
+                        gameData.price = "$" + new string(array);
                     }
 
-                    else if (pResponse.price.Length == 3)
+                    else if (gameData.price.Length == 3)
                     {
-                        var finalCostFormat = pResponse.price.Insert(1, ".");
+                        var finalCostFormat = gameData.price.Insert(1, ".");
                         char[] array = finalCostFormat.ToCharArray();
                         array[2] = '9';
-                        cost = "$" + new string(array);
+                        gameData.price = "$" + new string(array);
                     }
-                    pResponse.price = cost;
-                    flag = "OK";
-                }
-                else
-                {
-                    Console.WriteLine("No game found, possible dupe UPC.");
-                    flag = "FAIL";
-                    return "FAIL";
-                }  
-                return "OK";
-            }
 
+                    
+
+                }
+                
+                
+            }
+            return gameData;
         }
 
         public int writeGame()
         {
-            if (pResponse.price == null)
+            if (gameData.price == null)
             {
                 Console.WriteLine("No game found with this upc to be added to database.");
                 return -1;
             }
             var csv = new StringBuilder();
             status = true;
-            var newLine = string.Format("{0},{1},{2},{3}", pResponse.consoleType, pResponse.gameTitle,pResponse.price,pResponse.upc);
+            var newLine = string.Format("{0},{1},{2},{3}", gameData.console, gameData.title,gameData.price,gameData.upc);
             csv.AppendLine(newLine);
             try
             {
@@ -131,7 +122,7 @@ namespace PriceCheckerVGH
                     title.AppendLine(content);
                     File.AppendAllText(filePath, title.ToString());
                     File.AppendAllText(filePath, csv.ToString());
-                    Console.WriteLine(pResponse.gameTitle + " was added to file for price updating.");
+                    Console.WriteLine(gameData.title + " was added to file for price updating.");
                 }
                 catch (Exception ex2)
                 {
@@ -145,7 +136,7 @@ namespace PriceCheckerVGH
                 try
                 {
                     File.AppendAllText(filePath, csv.ToString());
-                    Console.WriteLine(pResponse.gameTitle + " was added to file for price updating.");
+                    Console.WriteLine(gameData.title + " was added to file for price updating.");
                 }
                 catch (Exception ex)
                 {
