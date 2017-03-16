@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GSValidator.Forms;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -15,6 +16,8 @@ namespace PriceCheckerVGH.Forms
     public partial class GameView : Form
     {
         List<Game> loadedGames = new List<Game>();
+        CoreRunner runner = new CoreRunner();
+
         private string filePath;
         public GameView()
         {
@@ -76,10 +79,38 @@ namespace PriceCheckerVGH.Forms
             Clipboard.SetText(loadedGames[listBox1.SelectedIndex].upc);
         }
 
-        private void GameView_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void label4_Click(object sender, EventArgs e)
         {
-              
+            
         }
+
+        private void tabPage2_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void label4_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            if (!runner.arduino.IsOpen)
+            {
+                runner.connect();
+                SerialStatusBox.Text = runner.arduino.status;
+                button1.Text = "Scan";
+            }
+            else
+            {
+                UPCDialog upcWindow = new UPCDialog(runner);
+                upcWindow.ShowDialog();
+            }
+            
+        }
+
+        
     }
 }
 

@@ -9,11 +9,28 @@ namespace PriceCheckerVGH
 {
     public class ScannerInterface : SerialPort
     {
+        public string status="null";
         public ScannerInterface()
         {
+            
+        }
+
+        public void writeToLcd(string topRow, string bottomRow)
+        {
+            WriteLine(topRow+"-"+bottomRow);
+            return;
+        }
+
+        public void connect()
+        {
+            if(IsOpen)
+            {
+                return;
+            }
             PortName = ("COM7");
             DataBits = 8;
-            Console.WriteLine("Connecting to COM...");
+
+            status = "Connecting to COM...";
             ReadTimeout = 30000;
 
             try
@@ -23,21 +40,13 @@ namespace PriceCheckerVGH
 
             catch (Exception ex)
             {
-                
-                Console.WriteLine(ex);
+                status = ("Failed to connect to device.");
             }
 
             if (IsOpen)
             {
-                Console.WriteLine("Connected to COM port.");
+                status = ("Connected to COM port.");
             }
         }
-
-        public void writeToLcd(string topRow, string bottomRow)
-        {
-            WriteLine(topRow+"-"+bottomRow);
-            return;
-        }
-
     }
 }

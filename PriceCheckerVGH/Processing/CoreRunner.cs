@@ -8,52 +8,58 @@ using System.Windows.Forms;
 
 namespace PriceCheckerVGH
 {
-    class CoreRunner
+    public class CoreRunner
     {
-        ScannerInterface arduino = new ScannerInterface();
+        public ScannerInterface arduino = new ScannerInterface();
         Core coreProcess = new Core();// object has all functions to get game data from upc, and write to csv
         string lastScan = null;
-        public int addGame()
+        public string status = "Initialized";
+        public async Task<int> addGame(string upc)
         {
-            
-            var input = Console.ReadLine();
-            
-            if (input.Length == 0)
+
+
+            if (upc.Length == 0)
             {
                 return -1; //-1 will stop program
             }
-            else if (lastScan == input)
+            else if (lastScan == upc)
             {
                 var gameCallStatus = coreProcess.writeGame();
-                arduino.writeToLcd(coreProcess.gameData.title, "added to .csv");
+                arduino.writeToLcd(coreProcess.gameData.title, " added to .csv");
+                status = coreProcess.gameData.title + " added to .csv"; 
                 lastScan = null;
                 return 0;
             }
             else
             {
-                coreProcess.getGame(input).Wait();
+                await Task.Run(() => coreProcess.getGame(upc));
                 try
                 {
                     arduino.writeToLcd(coreProcess.gameData.title, coreProcess.gameData.price);
                     Clipboard.SetText(coreProcess.gameData.upc);
-                    lastScan = input;//For the double scan system of adding the game to .csv
+                    lastScan = upc;//For the double scan system of adding the game to .csv
+                    status = coreProcess.gameData.title + " "+ coreProcess.gameData.price;
                 }
                 catch (Exception e)
-                {                   
+                {
                     try
                     {
-                        Console.WriteLine("No price for game found.");
                         arduino.writeToLcd(coreProcess.gameData.title, "No price found.");
+                        status = coreProcess.gameData.title + " No price found.";
                     }
-                    catch(Exception e1)
-                    {
-                        Console.WriteLine("Heck, the game wasnt even found!");
-                        arduino.writeToLcd("No UPC found","in database");
+                    catch (Exception e1)
+                    {                       
+                        arduino.writeToLcd("No UPC found", "in database");
+                        status = "No UPC found in database";
                     }
                     lastScan = null;
-                }                
+                }
                 return 0;
             }
+        }
+        public void connect()
+        {
+            arduino.connect();
         }
     }
 }

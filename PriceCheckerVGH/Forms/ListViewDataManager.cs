@@ -9,6 +9,6 @@ namespace PriceCheckerVGH.Forms
     class ListViewDataManager
     {
         GameView gameWindow = new GameView();
-        
+       
     }
 }

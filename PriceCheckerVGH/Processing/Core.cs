@@ -44,7 +44,7 @@ namespace PriceCheckerVGH
                 var response = await gamePricer.GetAsync(uri);
 
                 var jsonString = response.Content.ReadAsStringAsync();
-                jsonString.Wait();
+                await jsonString;
                 if (response.IsSuccessStatusCode)
                 {
 
